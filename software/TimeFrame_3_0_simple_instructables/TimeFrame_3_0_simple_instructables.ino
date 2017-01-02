@@ -17,30 +17,30 @@
 //
 //    GNU General Public License terms: <http://www.gnu.org/licenses/>.
 
-  const float freq = 80; //78.125; 
+  const float freq = 85.0;
   
-  float phase_shift = 0.5; //eg. f=0.5 -> T=2 -> 2 seconds per slow motion cycle
+  float phase_shift = -0.2; //eg. f=0.5 -> T=2 -> 2 seconds per slow motion cycle
 
-  //Timer 2 for Magnet
+  //Timer 0 for Magnet
   //Prescaler = 1024 = CS111 = 64us/tick
   //PIN 3
-  float duty_mag = 8; //12 be carefull not overheat the magnet. better adjustment through magnet position
+  float duty_mag = 50.0; //12 be carefull not overheat the magnet. better adjustment through magnet position
   float frequency_mag = freq;
-  long time_mag = round(16000000/1024/frequency_mag); 
+  long time_mag = round(16000000.0/1024.0/frequency_mag); 
 
   //Timer 1 for LED
   //Prescaler = 8 = CS010 = 0.5 us/tick
   //PIN 10
-  float duty_led = 20;
+  float duty_led = 30.0;
   float frequency_led = frequency_mag+phase_shift;
-  long time_led = round(16000000/8/frequency_led);
+  long time_led = round(16000000.0/8.0/frequency_led);
   
 void setup() {
-  pinMode(3, OUTPUT); //MAG: Timer 2B cycle output
+  pinMode(3, OUTPUT); //MAG: Timer 3A cycle output
   pinMode(10, OUTPUT); //LED: Timer 1B cycle output 
   mag_on();
-  OCR2A = round(time_mag); //output compare register
-  OCR2B = round(duty_mag*time_mag/100L); // output compare registers
+  OCR0A = round(time_mag); //output compare register
+  OCR0B = round(duty_mag*time_mag/100L); // output compare registers
   led_on();
   OCR1A = round(time_led); //output compare registers
   OCR1B = round(duty_led*time_led/100L); // output compare registers
@@ -52,15 +52,15 @@ void loop() {
 } //main loop
 
 void mag_on() {
-  TCCR2A = 0;
-  TCCR2B = 0;
-  TCCR2A = _BV(COM2A0) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);
-  TCCR2B = _BV(WGM22) | _BV(CS22)| _BV(CS21)| _BV(CS20);
+  TCCR0A = 0;
+  TCCR0B = 0;
+  TCCR0A = _BV(COM0B1) | _BV(WGM01) | _BV(WGM00);
+  TCCR0B = _BV(WGM02) | _BV(CS02) | _BV(CS00);
 }
 
 void led_on() {
   TCCR1A = 0;
   TCCR1B = 0;
   TCCR1A = _BV(COM1A0) | _BV(COM1B1) | _BV(WGM11) | _BV(WGM10); 
-  TCCR1B =  _BV(WGM13) | _BV(WGM12)  |  _BV(CS11);
+  TCCR1B =  _BV(WGM13) | _BV(WGM12)  | _BV(CS11);
 }
